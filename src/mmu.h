@@ -132,7 +132,7 @@ private:
                     // TODO: exception
                 }
                     
-                return entry_lo & 0xfffff000 | (virtual_addr & 0x00000fff);
+                return entry_lo << 6 & 0xfffff000 | (virtual_addr & 0x00000fff);
             }
         
         // TODO: TLB miss exception
