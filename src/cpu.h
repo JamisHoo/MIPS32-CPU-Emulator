@@ -19,6 +19,8 @@ private:
             // TODO: timer interrupt
             // TODO: who is responsible for clearing Count register
             // TODO: should init Count and Compare register?
+            // TODO: does KSU count?
+            // TODO: need to check IE/EXL before enter exception handling?
         }
 
         // instruction fetch
