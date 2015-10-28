@@ -76,7 +76,7 @@ private:
         }
 
         // access flash
-        if (addr >= FLASH_BASE && addr < FLASH_SIZE) {
+        if (addr >= FLASH_BASE && addr < FLASH_BASE + FLASH_SIZE) {
             flash_.seekg(addr - FLASH_BASE);
             uint8_t val;
             flash_.read((char*)(&val), 1);
