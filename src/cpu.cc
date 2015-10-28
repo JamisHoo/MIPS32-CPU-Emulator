@@ -72,7 +72,7 @@ void CPU::exe_mult() {
 }
 
 void CPU::exe_addu() {
-    registers_[rd()] = registers_[rs()] + registers_[rd()];
+    registers_[rd()] = registers_[rs()] + registers_[rt()];
     pc_ += 4;
 }
 
