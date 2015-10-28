@@ -29,7 +29,6 @@ public:
             // TODO: alignment exception
         }
         uint32_t physical_addr = addr_translate(virtual_addr, 0);
-        std::cout << "paddr == " << physical_addr << std::endl;
         return uint32_t(read_physical(physical_addr + 0))       |
                uint32_t(read_physical(physical_addr + 1)) <<  8 |
                uint32_t(read_physical(physical_addr + 2)) << 16 |
