@@ -19,7 +19,7 @@ public:
             // TODO: alignment exception
         }
         uint32_t physical_addr = addr_translate(virtual_addr, 0);
-        return uint16_t(read_physical(physical_addr + 0)) || 
+        return uint16_t(read_physical(physical_addr + 0)) | 
                uint16_t(read_physical(physical_addr + 1)) << 8;
 
     }
@@ -29,9 +29,10 @@ public:
             // TODO: alignment exception
         }
         uint32_t physical_addr = addr_translate(virtual_addr, 0);
-        return uint32_t(read_physical(physical_addr + 0))       ||
-               uint32_t(read_physical(physical_addr + 1)) <<  8 ||
-               uint32_t(read_physical(physical_addr + 2)) << 16 ||
+        std::cout << "paddr == " << physical_addr << std::endl;
+        return uint32_t(read_physical(physical_addr + 0))       |
+               uint32_t(read_physical(physical_addr + 1)) <<  8 |
+               uint32_t(read_physical(physical_addr + 2)) << 16 |
                uint32_t(read_physical(physical_addr + 3)) << 24;
 
     }
@@ -114,11 +115,11 @@ private:
     uint32_t addr_translate(uint32_t virtual_addr, bool write) {
         // kseg0, unmapped
         if (virtual_addr >= KSEG0_BASE && virtual_addr < KSEG0_BASE + KSEG0_SIZE) 
-            return virtual_addr & 0x10000000;
+            return virtual_addr & 0x1fffffff;
         
         // kseg1, unmapped
         if (virtual_addr >= KSEG1_BASE && virtual_addr < KSEG1_BASE + KSEG1_SIZE) 
-            return virtual_addr & 0x10000000;
+            return virtual_addr & 0x1fffffff;
 
         // kuseg or kseg2, mapped
         uint32_t vpn2 = virtual_addr >> 13;
@@ -140,29 +141,31 @@ private:
         // TODO: TLB miss exception
     }
 
+    // virtual memory layout
     constexpr static uint32_t KUSEG_BASE = 0;
     constexpr static uint32_t KUSEG_SIZE = 0x80000000;
 
     constexpr static uint32_t KSEG0_BASE = 0x80000000;
     constexpr static uint32_t KSEG0_SIZE = 0x20000000;
 
-    constexpr static uint32_t KSEG1_BASE = 0xA0000000;
+    constexpr static uint32_t KSEG1_BASE = 0xa0000000;
     constexpr static uint32_t KSEG1_SIZE = 0x20000000;
 
-    constexpr static uint32_t KSEG2_BASE = 0xC0000000;
+    constexpr static uint32_t KSEG2_BASE = 0xc0000000;
     constexpr static uint32_t KSEG2_SIZE = 0x40000000;
 
+    // physical memory layout
     constexpr static uint32_t RAM_BASE = 0;
     constexpr static uint32_t RAM_SIZE = 1024 * 1024 * 8;  // 8 MB
 
-    constexpr static uint32_t ROM_BASE = 0x10000000;
+    constexpr static uint32_t ROM_BASE = 0x1fc00000;
     constexpr static uint32_t ROM_SIZE = 1024 * 4;  // 4 KB
 
-    constexpr static uint32_t FLASH_BASE = 0x1E000000;
+    constexpr static uint32_t FLASH_BASE = 0x1e000000;
     constexpr static uint32_t FLASH_SIZE = 1024 * 1024 * 8;  // 8 MB
 
-    constexpr static uint32_t SERIAL_PORT = 0x1FD003F8;
-    constexpr static uint32_t SERIAL_STATUS = 0x1FD003FC;
+    constexpr static uint32_t SERIAL_PORT = 0x1fd003f8;
+    constexpr static uint32_t SERIAL_STATUS = 0x1fd003fc;
 
     std::string ram_;
     std::ifstream& rom_;
