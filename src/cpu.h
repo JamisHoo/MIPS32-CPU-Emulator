@@ -88,7 +88,7 @@ private:
     int16_t signed_immediate() const { return int16_t(instruction_ & 0xffff); }
     uint16_t unsigned_immediate() const { return uint16_t(instruction_ & 0xffff); }
 
-    constexpr static uint32_t PC_INITIAL = 0xBFC00000;
+    constexpr static uint32_t PC_INITIAL = 0xbfc00000;
 
     CP0 cp0_;
     MMU mmu_;
