@@ -1,9 +1,11 @@
+#include <iostream>
+#include <fstream>
 
 class MMU {
 public:
     MMU(std::ifstream& rom, std::ifstream& flash):
         rom_(rom), flash_(flash) {
-        ram.resize(RAM_SIZE);    
+        ram_.resize(RAM_SIZE);    
         // TODO: need initialize TLB?
     }
 
@@ -26,7 +28,7 @@ public:
         if (virtual_addr & 0x03) {
             // TODO: alignment exception
         }
-        uint32_t physical_addr = addr_tanslate(virtual_addr, 0);
+        uint32_t physical_addr = addr_translate(virtual_addr, 0);
         return uint32_t(read_physical(physical_addr + 0))       ||
                uint32_t(read_physical(physical_addr + 1)) <<  8 ||
                uint32_t(read_physical(physical_addr + 2)) << 16 ||
@@ -49,27 +51,27 @@ public:
     }
 
     void write_word(uint32_t virtual_addr, uint32_t data) {
-        if (virtual_addr && 0x11) {
+        if (virtual_addr & 0x11) {
             // TODO: alignment exception
         }
         uint32_t physical_addr = addr_translate(virtual_addr, 1);
         write_physical(physical_addr + 0, uint8_t(data));
         write_physical(physical_addr + 1, uint8_t(data >>  8));
         write_physical(physical_addr + 2, uint8_t(data >> 16));
-        write_physical(physical_addr + 3, uint8_t(data >> 32));
+        write_physical(physical_addr + 3, uint8_t(data >> 24));
     }
     
 private:
     uint8_t read_physical(uint32_t addr) {
         // access ram
         if (addr >= RAM_BASE && addr < RAM_BASE + RAM_SIZE)
-            return ram[addr - RAM_BASE];
+            return ram_[addr - RAM_BASE];
 
         // access rom
         if (addr >= ROM_BASE && addr < ROM_BASE + ROM_SIZE) {
             rom_.seekg(addr - ROM_BASE);
             uint8_t val;
-            rom_.read(&val, 1);
+            rom_.read((char*)(&val), 1);
             return val;
         }
 
@@ -77,7 +79,7 @@ private:
         if (addr >= FLASH_BASE && addr < FLASH_SIZE) {
             flash_.seekg(addr - FLASH_BASE);
             uint8_t val;
-            flash_.read(&val, 1);
+            flash_.read((char*)(&val), 1);
             return val;
         }
 
@@ -98,7 +100,7 @@ private:
     void write_physical(uint32_t addr, uint8_t data) {
         // access ram
         if (addr >= RAM_BASE && addr < RAM_BASE + RAM_SIZE)
-            ram[addr - RAM_BASE] = data;
+            ram_[addr - RAM_BASE] = data;
 
         if (addr == SERIAL_PORT) {
             // to stdout
@@ -132,43 +134,42 @@ private:
                     // TODO: exception
                 }
                     
-                return entry_lo << 6 & 0xfffff000 | (virtual_addr & 0x00000fff);
+                return (entry_lo << 6 & 0xfffff000) | (virtual_addr & 0x00000fff);
             }
         
         // TODO: TLB miss exception
-
     }
 
-    constexpr uint32_t KUSEG_BASE = 0;
-    constexpr uint32_t KUSEG_SIZE = 0x80000000;
+    constexpr static uint32_t KUSEG_BASE = 0;
+    constexpr static uint32_t KUSEG_SIZE = 0x80000000;
 
-    constexpr uint32_t KSEG0_BASE = 0x80000000;
-    constexpr uint32_t KSEG0_SIZE = 0x20000000;
+    constexpr static uint32_t KSEG0_BASE = 0x80000000;
+    constexpr static uint32_t KSEG0_SIZE = 0x20000000;
 
-    constexpr uint32_t KSEG1_BASE = 0xA0000000;
-    constexpr uint32_t KSEG1_SIZE = 0x20000000;
+    constexpr static uint32_t KSEG1_BASE = 0xA0000000;
+    constexpr static uint32_t KSEG1_SIZE = 0x20000000;
 
-    constexpr uint32_t KSEG2_BASE = 0xC0000000;
-    constexpr uint32_t KSEG2_SIZE = 0x40000000;
+    constexpr static uint32_t KSEG2_BASE = 0xC0000000;
+    constexpr static uint32_t KSEG2_SIZE = 0x40000000;
 
-    constexpr uint32_t RAM_BASE = 0;
-    constexpr uint32_t RAM_SIZE = 1024 * 1024 * 8;  // 8 MB
+    constexpr static uint32_t RAM_BASE = 0;
+    constexpr static uint32_t RAM_SIZE = 1024 * 1024 * 8;  // 8 MB
 
-    constexpr uint32_t ROM_BASE = 0x10000000;
-    constexpr uint32_t ROM_SIZE = 1024 * 4;  // 4 KB
+    constexpr static uint32_t ROM_BASE = 0x10000000;
+    constexpr static uint32_t ROM_SIZE = 1024 * 4;  // 4 KB
 
-    constexpr uint32_t FLASH_BASE = 0x1E000000;
-    constexpr uint32_t FLASH_SIZE = 1024 * 1024 * 8;  // 8 MB
+    constexpr static uint32_t FLASH_BASE = 0x1E000000;
+    constexpr static uint32_t FLASH_SIZE = 1024 * 1024 * 8;  // 8 MB
 
-    constexpr uint32_t SERIAL_PORT = 0x1FD003F8;
-    constexpr uint32_t SERIAL_STATUS = 0x1FD003FC;
+    constexpr static uint32_t SERIAL_PORT = 0x1FD003F8;
+    constexpr static uint32_t SERIAL_STATUS = 0x1FD003FC;
 
     std::string ram_;
     std::ifstream& rom_;
     std::ifstream& flash_;
 
-    constexpr uint32_t k_TLB_ENTRIES = 16;
-
+    constexpr static uint32_t k_TLB_ENTRIES = 16;
+public:
     // TLB key: VPN2(19 bits) | 0(5 bits) | ASID(8 bits)
     uint32_t tlb_key_[k_TLB_ENTRIES];
     // TLB data: PFN(26 bits) | C(3 bits) | D(1bit) | V(1bit) | G(1bit)

@@ -1,3 +1,5 @@
+#include "cpu.h"
+
 void CPU::exe_sll() {
     registers_[rd()] = registers_[rt()] << shift();
     pc_ += 4;
@@ -95,12 +97,12 @@ void CPU::exe_xor() {
 }
 
 void CPU::exe_slt() {
-    registers_[rd()] = int32_t(registers_[rs()]) < int32_t(registers_[rt()])? 0x01, 0x00;
+    registers_[rd()] = int32_t(registers_[rs()]) < int32_t(registers_[rt()])? 0x01: 0x00;
     pc_ += 4;
 }
 
 void CPU::exe_sltu() {
-    registers_[rd()] = uint32_t(registers_[rs()]) < uint32_t(registers_[rt()])? 0x01, 0x00;
+    registers_[rd()] = uint32_t(registers_[rs()]) < uint32_t(registers_[rt()])? 0x01: 0x00;
     pc_ += 4;
 }
 
@@ -117,12 +119,12 @@ void CPU::exe_bgez() {
 }
 
 void CPU::exe_j() {
-    pc_ = pc_ & 0xf0000000 | jump_target() * 4;
+    pc_ = (pc_ & 0xf0000000) | jump_target() * 4;
 }
 
 void CPU::exe_jal() {
     registers_[REG_RA] = pc_ + 4;
-    pc_ = pc_ & 0xf0000000 | jump_target() * 4;
+    pc_ = (pc_ & 0xf0000000) | jump_target() * 4;
 }
 
 void CPU::exe_beq() {
@@ -196,8 +198,8 @@ void CPU::exe_mtc0() {
 
 void CPU::exe_tlbwi() {
     mmu_.tlb_key_[cp0_.registers_[cp0_.Index]] = cp0_.registers_[cp0_.EntryHi];
-    mmu_.tlb_data_[0][cp0_.registers_[cp0_.Index]] = cp0_registers_[cp0_.EntryLo0];
-    mmu_.tlb_data_[1][cp0_.registers_[cp0_.Index]] = cp0_registers_[cp0_.EntryLo1];
+    mmu_.tlb_data_[0][cp0_.registers_[cp0_.Index]] = cp0_.registers_[cp0_.EntryLo0];
+    mmu_.tlb_data_[1][cp0_.registers_[cp0_.Index]] = cp0_.registers_[cp0_.EntryLo1];
     pc_ += 4;
 }
 
@@ -246,9 +248,9 @@ void CPU::exe_cache() {
 }
 
 void CPU::instruction_decode() {
-    switch (main_opcode(instruction)) {
+    switch (main_opcode()) {
         case 0b000000: 
-            switch (sub_opcode(instruction)) {
+            switch (sub_opcode()) {
                 // sll
                 case 0b000000:
                 // srl
@@ -295,15 +297,17 @@ void CPU::instruction_decode() {
                 case 0b101011:
                 // TODO: exception
                 default:
+                    ;
             }
         case 0b000001: 
-            switch (rt(instruction)) {
+            switch (rt()) {
                 // bltz
                 case 0b00000:
                 // bgez
                 case 0b00001:
                 // TODO: exception
                 default:
+                    ;
             }
         // j
         case 0b000010:
@@ -332,16 +336,16 @@ void CPU::instruction_decode() {
         // lui
         case 0b001111:
         case 0b010000:
-            switch (sub_opcode(instruction)) {
+            switch (sub_opcode()) {
                 case 0b000000:
-                    switch (rs(instruction)) {
+                    switch (rs()) {
                         // mfc0
                         case 0b00000:
                         // mtc0
                         case 0b00100:
                         // TODO: exception
                         default:
-                            
+                            ; 
                     }
                 // tlbwi
                 case 0b000010:
@@ -349,6 +353,7 @@ void CPU::instruction_decode() {
                 case 0b011000:
                 // TODO: exception
                 default:
+                    ;
             }
         // lb
         case 0b100000:
@@ -364,5 +369,6 @@ void CPU::instruction_decode() {
         case 0b101011:
         // cache
         case 0b101111:
+            ;
     }
 }

@@ -1,5 +1,5 @@
 #include "cp0.h"
-#include "mem.h"
+#include "mmu.h"
 
 class CPU {
 public:
@@ -15,7 +15,7 @@ public:
     
 private:
     void next() {
-        register_[REG_ZERO] = 0x00;
+        registers_[REG_ZERO] = 0x00;
 
         // TODO: clock
 
@@ -82,13 +82,13 @@ private:
     uint32_t rs() const { return instruction_ >> 21 & 0x1f; }
     uint32_t rt() const { return instruction_ >> 16 & 0x1f; }
     uint32_t rd() const { return instruction_ >> 11 & 0x1f; }
-    uint32_t shiff() const { return instruction_ >> 6 & 0x1f; }
+    uint32_t shift() const { return instruction_ >> 6 & 0x1f; }
     int16_t branch_offset() const { return int16_t(instruction_ & 0xffff); }
     uint32_t jump_target() const { return instruction_ & 0x3ffffff; }
-    int16_t singed_immediate() const { return int16_t(instruction_ & 0xffff); }
+    int16_t signed_immediate() const { return int16_t(instruction_ & 0xffff); }
     uint16_t unsigned_immediate() const { return uint16_t(instruction_ & 0xffff); }
 
-    constexpr uint32_t PC_INITIAL = 0xBFC00000;
+    constexpr static uint32_t PC_INITIAL = 0xBFC00000;
 
     CP0 cp0_;
     MMU mmu_;

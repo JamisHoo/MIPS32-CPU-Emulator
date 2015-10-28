@@ -1,11 +1,10 @@
+#include <cstdint>
 
-class CP0 {
-public:
+struct CP0 {
     CP0() {
         // TODO: initialize some reg
     }
 
-private:
     enum { 
         SR = 12, 
         Cause = 13,
