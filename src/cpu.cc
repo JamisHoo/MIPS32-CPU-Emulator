@@ -107,15 +107,13 @@ void CPU::exe_sltu() {
 void CPU::exe_bltz() {
     if (int32_t(registers_[rs()]) < 0)
         pc_ += branch_offset() * 4;
-    else
-        pc_ += 4;
+    pc_ += 4;
 }
 
 void CPU::exe_bgez() {
     if (int32_t(registers_[rs()]) >= 0)
         pc_ += branch_offset() * 4;
-    else
-        pc_ += 4;
+    pc_ += 4;
 }
 
 void CPU::exe_j() {
@@ -130,29 +128,25 @@ void CPU::exe_jal() {
 void CPU::exe_beq() {
     if (registers_[rs()] == registers_[rt()])
         pc_ += branch_offset() * 4;
-    else
-        pc_ += 4;
+    pc_ += 4;
 }
 
 void CPU::exe_bne() {
     if (registers_[rs()] != registers_[rt()])
         pc_ += branch_offset() * 4;
-    else
-        pc_ += 4;
+    pc_ += 4;
 }
 
 void CPU::exe_blez() {
     if (int32_t(registers_[rs()]) <= 0)
         pc_ += branch_offset() * 4;
-    else
-        pc_ += 4;
+    pc_ += 4;
 }
 
 void CPU::exe_bgtz() {
     if (int32_t(registers_[rs()]) > 0)
         pc_ += branch_offset() * 4;
-    else
-        pc_ += 4;
+    pc_ += 4;
 }
 
 void CPU::exe_addiu() {
@@ -209,7 +203,8 @@ void CPU::exe_tlbwi() {
 
 void CPU::exe_eret() {
     pc_ = cp0_.registers_[cp0_.EPC];
-    cp0_.registers_[cp0_.SR] &= 0xfffffffd;
+    // TODO: who should be responsible for restoring EXL?
+    //cp0_.registers_[cp0_.SR] &= 0xfffffffd;
 }
 
 void CPU::exe_lb() {
