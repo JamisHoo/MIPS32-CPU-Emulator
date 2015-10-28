@@ -17,6 +17,8 @@ private:
     void next() {
         register_[REG_ZERO] = 0x00;
 
+        // TODO: clock
+
         // instruction fetch
         instruction_ = mmu_.read_word(pc_);
 
