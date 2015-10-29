@@ -44,7 +44,7 @@ struct CP0 {
     }
 
     bool interrupt_enabled() const {
-        return !(registers_[Status] & 0x03);
+        return !(registers_[Status] & 0b111);
     }
 
     bool interrupt_enabled(uint32_t interrupt_mask) const {
