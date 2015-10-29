@@ -9,14 +9,19 @@ public:
         // TODO: need initialize TLB?
     }
 
-    uint8_t read_byte(uint32_t virtual_addr) {
+    uint8_t read_byte(uint32_t virtual_addr, bool& exception) {
+        // TODO: Exception: access kernel space from user mode?
         uint32_t physical_addr = addr_translate(virtual_addr, 0);
         return read_physical(physical_addr); 
     }
 
-    uint16_t read_half_word(uint32_t virtual_addr) {
+    uint16_t read_half_word(uint32_t virtual_addr, bool& exception) {
         if (virtual_addr & 0x01) {
-            // TODO: alignment exception
+            // load from an address that is not aligned on a halfword boundary
+            cp0_.set_exception_code(cp0_.Exc_AdEL);
+            cp0_.registers_[cp0_.BadVAddr] = virtual_addr;
+            exception = true;
+            return 0x00;
         }
         uint32_t physical_addr = addr_translate(virtual_addr, 0);
         return uint16_t(read_physical(physical_addr + 0)) | 
@@ -24,9 +29,13 @@ public:
 
     }
 
-    uint32_t read_word(uint32_t virtual_addr) {
+    uint32_t read_word(uint32_t virtual_addr, bool& exception) {
         if (virtual_addr & 0x03) {
-            // TODO: alignment exception
+            // load or instruction fetch from an address that is not aligned on a word boundary
+            cp0_.set_exception_code(cp0_.Exc_AdEL)
+            cp0_.registers_[cp0_.BadVAddr] = virtual_addr;
+            exception = true;
+            return 0x00;
         }
         uint32_t physical_addr = addr_translate(virtual_addr, 0);
         return uint32_t(read_physical(physical_addr + 0))       |
@@ -36,23 +45,31 @@ public:
 
     }
 
-    void write_byte(uint32_t virtual_addr, uint8_t data) {
+    void write_byte(uint32_t virtual_addr, uint8_t data, bool& exception) {
         uint32_t physical_addr = addr_translate(virtual_addr, 1);
         write_physical(physical_addr, data);
     }
 
-    void write_half_word(uint32_t virtual_addr, uint16_t data) { 
+    void write_half_word(uint32_t virtual_addr, uint16_t data, bool& exception) { 
         if (virtual_addr & 0x01) {
-            // TODO: alignment exception
+            // save to an address that is not aligned on a halfword boundary
+            cp0_.set_exception_code(cp0_.Exc_AdES);
+            cp0_.registers_[cp0_.BadVAddr] = virtual_addr;
+            exception = true;
+            return;
         }
         uint32_t physical_addr = addr_translate(virtual_addr, 1);
         write_physical(physical_addr + 0, uint8_t(data));
         write_physical(physical_addr + 1, uint8_t(data >> 8));
     }
 
-    void write_word(uint32_t virtual_addr, uint32_t data) {
-        if (virtual_addr & 0x11) {
-            // TODO: alignment exception
+    void write_word(uint32_t virtual_addr, uint32_t data, bool& exception) {
+        if (virtual_addr & 0x03) {
+            // save to an address that is not aligned on a word boundary
+            cp0_.set_exception_code(cp0_.Exc_AdES);
+            cp0_.registers_[cp0_.BadVAddr] = virtual_addr;
+            exception = true;
+            return;
         }
         uint32_t physical_addr = addr_translate(virtual_addr, 1);
         write_physical(physical_addr + 0, uint8_t(data));
