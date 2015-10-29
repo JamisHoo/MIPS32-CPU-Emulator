@@ -1,10 +1,16 @@
+#ifndef MMU_
+#define MMU_
+
 #include <iostream>
 #include <fstream>
 
+#include "cp0.h"
+
+
 class MMU {
 public:
-    MMU(std::ifstream& rom, std::ifstream& flash):
-        rom_(rom), flash_(flash) {
+    MMU(CP0& cp0, std::ifstream& rom, std::ifstream& flash):
+        cp0_(cp0), rom_(rom), flash_(flash) {
         ram_.resize(RAM_SIZE);    
         // TODO: need initialize TLB?
     }
@@ -34,7 +40,7 @@ public:
     uint32_t read_word(uint32_t virtual_addr, bool& exception) {
         if (virtual_addr & 0x03) {
             // load or instruction fetch from an address that is not aligned on a word boundary
-            cp0_.set_exception_code(cp0_.Exc_AdEL)
+            cp0_.set_exception_code(cp0_.Exc_AdEL);
             cp0_.registers_[cp0_.BadVAddr] = virtual_addr;
             exception = true;
             return 0x00;
@@ -117,6 +123,7 @@ private:
         
 
         // other space
+        return 0x00;
     }
 
     void write_physical(uint32_t addr, uint8_t data) {
@@ -162,7 +169,7 @@ private:
                 // D bit
                 if (!(entry_lo >> 2 & 0x01) && write) {
                     // TLB  Modified exception
-                    cp0_.set_exception_code(cp0_.Mod);
+                    cp0_.set_exception_code(cp0_.Exc_Mod);
                     cp0_.registers_[cp0_.BadVAddr] = virtual_addr;
                     cp0_.registers_[cp0_.Context] &= 0xff80000f;
                     cp0_.registers_[cp0_.Context] |= virtual_addr >> 13 << 4;
@@ -216,6 +223,8 @@ private:
     std::ifstream& rom_;
     std::ifstream& flash_;
 
+    CP0& cp0_;
+
     constexpr static uint32_t k_TLB_ENTRIES = 16;
 public:
     // TLB key: VPN2(19 bits) | 0(5 bits) | ASID(8 bits)
@@ -223,3 +232,5 @@ public:
     // TLB data: PFN(26 bits) | C(3 bits) | D(1bit) | V(1bit) | G(1bit)
     uint32_t tlb_data_[2][k_TLB_ENTRIES];
 };
+
+#endif /* MMU_ */
