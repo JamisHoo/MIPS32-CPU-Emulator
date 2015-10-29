@@ -18,7 +18,7 @@ void CPU::exe_sra(bool&) {
 }
 
 void CPU::exe_sllv(bool&) {
-    registers_[rd()] = registers_[rt()] >> registers_[rs()];
+    registers_[rd()] = registers_[rt()] << registers_[rs()];
     pc_ += 4;
 }
 
