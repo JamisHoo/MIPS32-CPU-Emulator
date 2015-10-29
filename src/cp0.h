@@ -2,6 +2,7 @@
 
 struct CP0 {
     CP0(): registers_{ 0 } {
+        // TODO: are these necessary?
         registers_[Compare] = 0xffffffff;
         registers_[EBase] = 0x80000180;
     }
