@@ -15,7 +15,7 @@ private:
         registers_[REG_ZERO] = 0x00;
 
         cp0_.registers_[cp0_.Count]++;
-        if (cp0_.registers_[cp0_.Count] == cp0_.registers[cp0_.Compare]) {
+        if (cp0_.registers_[cp0_.Count] == cp0_.registers_[cp0_.Compare]) {
             // TODO: timer interrupt
             // TODO: who is responsible for clearing Count register
             // TODO: should init Count and Compare register?
