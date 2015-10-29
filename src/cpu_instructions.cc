@@ -214,8 +214,8 @@ void CPU::exe_tlbwi(bool&) {
 
 void CPU::exe_eret(bool&) {
     pc_ = cp0_.registers_[cp0_.EPC];
-    // TODO: who should be responsible for restoring EXL?
-    //cp0_.registers_[cp0_.SR] &= 0xfffffffd;
+    // hardware should be responsible for restoring EXL
+    cp0_.registers_[cp0_.SR] &= 0xfffffffd;
 }
 
 void CPU::exe_lb(bool& exception) {
