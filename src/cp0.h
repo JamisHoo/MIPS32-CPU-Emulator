@@ -1,3 +1,6 @@
+#ifndef CP0_
+#define CP0_
+
 #include <cstdint>
 
 struct CP0 {
@@ -73,3 +76,5 @@ struct CP0 {
 
     uint32_t registers_[32];
 };
+
+#endif /* CP0_ */
