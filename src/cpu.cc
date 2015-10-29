@@ -174,5 +174,9 @@ void CPU::instruction_decode(bool& exception) {
         // cache
         case 0b101111:
             return exe_cache();
+        default:
+            cp0_.set_exception_code(cp0_.Exc_RI);
+            exception = true;
+            return;
     }
 }
