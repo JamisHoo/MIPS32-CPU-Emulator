@@ -1,84 +1,113 @@
+#ifndef CPU_
+#define CPU_
 #include "cp0.h"
 #include "mmu.h"
 
 class CPU {
 public:
-    CPU(std::ifstream& rom, std::ifstream& flash): mmu_(rom, flash), pc_(PC_INITIAL) { }
+    CPU(std::ifstream& rom, std::ifstream& flash): cp0_(), mmu_(cp0_, rom, flash), pc_(PC_INITIAL) { }
 
     void run() {
-        while (true) 
-            next();
+        while (true) {
+            bool exception = false;
+            next(exception);
+            
+            if (exception) {
+                // store return pc only in normal level
+                if (!cp0_.Status_EXL())
+                    cp0_.registers_[cp0_.EPC] = pc_;
+                // jump to EBase
+                pc_ = cp0_.registers_[cp0_.EBase];
+                // set EXL to 1
+                cp0_.set_Status_EXL();
+            }
+        }
     }
     
 private:
-    void next() {
+    void next(bool& exception) {
         registers_[REG_ZERO] = 0x00;
 
         cp0_.registers_[cp0_.Count]++;
-        if (cp0_.registers_[cp0_.Count] == cp0_.registers_[cp0_.Compare]) {
-            // TODO: timer interrupt
-            // TODO: who is responsible for clearing Count register
-            // TODO: should init Count and Compare register?
-            // TODO: does KSU count?
-            // TODO: need to check IE/EXL before enter exception handling?
-        }
+
+        
+        // TODO: set BadVAddr when address-related exception occurs
+        // TODO: who is responsible for clearing Count register
+        // TODO: does KSU count?
+        // TODO: need to check IE/EXL before enter exception handling?
 
         // instruction fetch
-        instruction_ = mmu_.read_word(pc_);
+        instruction_ = mmu_.read_word(pc_, exception);
 
         // instruction decode
-        instruction_decode();
+        instruction_decode(exception);
+
+
+        // TODO: what if exception is already triggered?
+
+        // timer interrupt
+        // interrupt will be handled after the current instruction
+        if (cp0_.registers_[cp0_.Count] >= cp0_.registers_[cp0_.Compare]) {
+            cp0_.set_interrupt_code(cp0_.IP_7);
+
+            if (cp0_.interrupt_enabled() && /* IE and EXL */
+                cp0_.interrupt_enabled(cp0_.IP_7) /* timer interrupt is enabled */) {
+                cp0_.set_exception_code(cp0_.Exc_Int);
+                exception = true;
+                return;
+            }
+        }
     }
 
-    void instruction_decode();
+    void instruction_decode(bool& exception);
 
-    void exe_sll(); 
-    void exe_srl(); 
-    void exe_sra(); 
-    void exe_sllv(); 
-    void exe_srav(); 
-    void exe_jr();
-    void exe_jalr();
-    void exe_syscall();
-    void exe_mfhi();
-    void exe_mthi();
-    void exe_mflo();
-    void exe_mtlo();
-    void exe_mult();
-    void exe_addu();
-    void exe_subu();
-    void exe_and();
-    void exe_or();
-    void exe_xor();
-    void exe_nor();
-    void exe_slt();
-    void exe_sltu();
-    void exe_bltz();
-    void exe_bgez();
-    void exe_j();
-    void exe_jal();
-    void exe_beq();
-    void exe_bne();
-    void exe_blez();
-    void exe_bgtz();
-    void exe_addiu();
-    void exe_slti();
-    void exe_sltiu();
-    void exe_andi();
-    void exe_ori();
-    void exe_xori();
-    void exe_lui();
-    void exe_mfc0();
-    void exe_mtc0();
-    void exe_tlbwi();
-    void exe_eret();
-    void exe_lb();
-    void exe_lw();
-    void exe_lbu();
-    void exe_lhu();
-    void exe_sb();
-    void exe_sw();
-    void exe_cache();
+    void exe_sll(bool& exception); 
+    void exe_srl(bool& exception); 
+    void exe_sra(bool& exception); 
+    void exe_sllv(bool& exception); 
+    void exe_srav(bool& exception); 
+    void exe_jr(bool& exception);
+    void exe_jalr(bool& exception);
+    void exe_syscall(bool& exception);
+    void exe_mfhi(bool& exception);
+    void exe_mthi(bool& exception);
+    void exe_mflo(bool& exception);
+    void exe_mtlo(bool& exception);
+    void exe_mult(bool& exception);
+    void exe_addu(bool& exception);
+    void exe_subu(bool& exception);
+    void exe_and(bool& exception);
+    void exe_or(bool& exception);
+    void exe_xor(bool& exception);
+    void exe_nor(bool& exception);
+    void exe_slt(bool& exception);
+    void exe_sltu(bool& exception);
+    void exe_bltz(bool& exception);
+    void exe_bgez(bool& exception);
+    void exe_j(bool& exception);
+    void exe_jal(bool& exception);
+    void exe_beq(bool& exception);
+    void exe_bne(bool& exception);
+    void exe_blez(bool& exception);
+    void exe_bgtz(bool& exception);
+    void exe_addiu(bool& exception);
+    void exe_slti(bool& exception);
+    void exe_sltiu(bool& exception);
+    void exe_andi(bool& exception);
+    void exe_ori(bool& exception);
+    void exe_xori(bool& exception);
+    void exe_lui(bool& exception);
+    void exe_mfc0(bool& exception);
+    void exe_mtc0(bool& exception);
+    void exe_tlbwi(bool& exception);
+    void exe_eret(bool& exception);
+    void exe_lb(bool& exception);
+    void exe_lw(bool& exception);
+    void exe_lbu(bool& exception);
+    void exe_lhu(bool& exception);
+    void exe_sb(bool& exception);
+    void exe_sw(bool& exception);
+    void exe_cache(bool& exception);
 
 
     uint32_t main_opcode() const { return instruction_ >> 26; }
@@ -118,3 +147,5 @@ private:
     uint32_t hi_, lo_;
 
 };
+
+#endif /* CPU_ */
