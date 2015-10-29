@@ -12,7 +12,7 @@ public:
     MMU(CP0& cp0, std::ifstream& rom, std::ifstream& flash):
         cp0_(cp0), rom_(rom), flash_(flash) {
         ram_.resize(RAM_SIZE);    
-        // TODO: need initialize TLB?
+        // need not initialize TLB
     }
 
     uint8_t read_byte(uint32_t virtual_addr, bool& exception) {
