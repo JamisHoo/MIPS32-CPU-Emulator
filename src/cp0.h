@@ -1,8 +1,9 @@
 #include <cstdint>
 
 struct CP0 {
-    CP0() {
-        // TODO: initialize some reg
+    CP0(): registers_{ 0 } {
+        registers_[Compare] = 0xffffffff;
+        registers_[EBase] = 0x80000180;
     }
 
     enum { 
@@ -18,6 +19,30 @@ struct CP0 {
         EntryLo1 = 3,
         Index = 0,
         EBase = 15
+    };
+
+    enum {
+        // ExcCode field in Cause
+        Exc_Int = 0,
+        Exc_Mod = 1,
+        Exc_TLBL = 2,
+        Exc_TLBS = 3,
+        Exc_AdEL = 4,
+        Exc_AdES = 5,
+        Exc_Syscall = 8,
+        Exc_RI = 10
+    };
+    
+    enum {
+        // IP7-0 field in Cause
+        IP_0 = 1,
+        IP_1 = 2,
+        IP_2 = 4,
+        IP_3 = 8,
+        IP_4 = 16,
+        IP_5 = 32,
+        IP_6 = 64,
+        IP_7 = 128
     };
 
     uint32_t registers_[32];
