@@ -22,7 +22,7 @@ struct CP0 {
         EBase = 15
     };
 
-    enum {
+    enum :uint32_t {
         // ExcCode field in Cause
         Exc_Int = 0,
         Exc_Mod = 1,
@@ -33,8 +33,17 @@ struct CP0 {
         Exc_Syscall = 8,
         Exc_RI = 10
     };
+
+    void set_exception_code(uint32_t exc_code) {
+        registers_[Cause] &= 0xffffff83;
+        registers_[Cause] |= exc_code << 2;
+    }
+
+    void set_interrupt_code(uint32_t interrupt_code) {
+        registers_[Cause] |= interrupt_code << 8;
+    }
     
-    enum {
+    enum :uint32_t {
         // IP7-0 field in Cause
         IP_0 = 1,
         IP_1 = 2,
