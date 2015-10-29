@@ -44,15 +44,15 @@ struct CP0 {
     }
 
     bool interrupt_enabled() const {
-        return !(registers_[Status] & 0b111);
+        return !(registers_[SR] & 0b111);
     }
 
     bool interrupt_enabled(uint32_t interrupt_mask) const {
-        return registers_[Status] & interrupt_mask << 8;
+        return registers_[SR] & interrupt_mask << 8;
     }
 
     void set_Status_EXL() {
-        registers_[Status] |= 0x02;
+        registers_[SR] |= 0x02;
     }
 
     enum :uint32_t {
