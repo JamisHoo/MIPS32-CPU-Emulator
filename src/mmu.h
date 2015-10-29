@@ -11,7 +11,8 @@ public:
 
     uint8_t read_byte(uint32_t virtual_addr, bool& exception) {
         // TODO: Exception: access kernel space from user mode?
-        uint32_t physical_addr = addr_translate(virtual_addr, 0);
+        uint32_t physical_addr = addr_translate(virtual_addr, 0, exception);
+        if (exception) return 0x00;
         return read_physical(physical_addr); 
     }
 
@@ -23,7 +24,8 @@ public:
             exception = true;
             return 0x00;
         }
-        uint32_t physical_addr = addr_translate(virtual_addr, 0);
+        uint32_t physical_addr = addr_translate(virtual_addr, 0, exception);
+        if (exception) return 0x00;
         return uint16_t(read_physical(physical_addr + 0)) | 
                uint16_t(read_physical(physical_addr + 1)) << 8;
 
@@ -37,7 +39,8 @@ public:
             exception = true;
             return 0x00;
         }
-        uint32_t physical_addr = addr_translate(virtual_addr, 0);
+        uint32_t physical_addr = addr_translate(virtual_addr, 0, exception);
+        if (exception) return 0x00;
         return uint32_t(read_physical(physical_addr + 0))       |
                uint32_t(read_physical(physical_addr + 1)) <<  8 |
                uint32_t(read_physical(physical_addr + 2)) << 16 |
@@ -46,7 +49,8 @@ public:
     }
 
     void write_byte(uint32_t virtual_addr, uint8_t data, bool& exception) {
-        uint32_t physical_addr = addr_translate(virtual_addr, 1);
+        uint32_t physical_addr = addr_translate(virtual_addr, 1, exception);
+        if (exception) return;
         write_physical(physical_addr, data);
     }
 
@@ -58,7 +62,8 @@ public:
             exception = true;
             return;
         }
-        uint32_t physical_addr = addr_translate(virtual_addr, 1);
+        uint32_t physical_addr = addr_translate(virtual_addr, 1, exception);
+        if (exception) return;
         write_physical(physical_addr + 0, uint8_t(data));
         write_physical(physical_addr + 1, uint8_t(data >> 8));
     }
@@ -71,7 +76,8 @@ public:
             exception = true;
             return;
         }
-        uint32_t physical_addr = addr_translate(virtual_addr, 1);
+        uint32_t physical_addr = addr_translate(virtual_addr, 1, exception);
+        if (exception) return;
         write_physical(physical_addr + 0, uint8_t(data));
         write_physical(physical_addr + 1, uint8_t(data >>  8));
         write_physical(physical_addr + 2, uint8_t(data >> 16));
@@ -106,7 +112,6 @@ private:
         }
             
         if (addr == SERIAL_STATUS) {
-            // TODO: handle serial port 
             return 0x01;
         }
         
@@ -128,7 +133,7 @@ private:
         // other space
     }
 
-    uint32_t addr_translate(uint32_t virtual_addr, bool write) {
+    uint32_t addr_translate(uint32_t virtual_addr, bool write, bool& exception) {
         // kseg0, unmapped
         if (virtual_addr >= KSEG0_BASE && virtual_addr < KSEG0_BASE + KSEG0_SIZE) 
             return virtual_addr & 0x1fffffff;
@@ -143,18 +148,42 @@ private:
             if (tlb_key_[i] >> 13 == vpn2) {
                 uint32_t entry_lo = tlb_data_[virtual_addr >> 12 & 0x01][i];
                 // V bit
-                if (entry_lo >> 1 & 0x01) {
-                    // TODO: exception
+                if (!(entry_lo >> 1 & 0x01)) {
+                    // TLB Invalid exception
+                    cp0_.set_exception_code(write? cp0_.Exc_TLBS: cp0_.Exc_TLBL);
+                    cp0_.registers_[cp0_.BadVAddr] = virtual_addr;
+                    cp0_.registers_[cp0_.Context] &= 0xff80000f;
+                    cp0_.registers_[cp0_.Context] |= virtual_addr >> 13 << 4;
+                    cp0_.registers_[cp0_.EntryHi] &= 0x00001fff; 
+                    cp0_.registers_[cp0_.EntryHi] |= virtual_addr & 0xffffe000;
+                    exception = true;
+                    return 0x00;
                 }
                 // D bit
                 if (!(entry_lo >> 2 & 0x01) && write) {
-                    // TODO: exception
+                    // TLB  Modified exception
+                    cp0_.set_exception_code(cp0_.Mod);
+                    cp0_.registers_[cp0_.BadVAddr] = virtual_addr;
+                    cp0_.registers_[cp0_.Context] &= 0xff80000f;
+                    cp0_.registers_[cp0_.Context] |= virtual_addr >> 13 << 4;
+                    cp0_.registers_[cp0_.EntryHi] &= 0x00001fff; 
+                    cp0_.registers_[cp0_.EntryHi] |= virtual_addr & 0xffffe000;
+                    exception = true;
+                    return 0x00;
                 }
                     
                 return (entry_lo << 6 & 0xfffff000) | (virtual_addr & 0x00000fff);
             }
         
-        // TODO: TLB miss exception
+        // TLB refill exception
+        cp0_.set_exception_code(write? cp0_.Exc_TLBS: cp0_.Exc_TLBL);
+        cp0_.registers_[cp0_.BadVAddr] = virtual_addr;
+        cp0_.registers_[cp0_.Context] &= 0xff80000f;
+        cp0_.registers_[cp0_.Context] |= virtual_addr >> 13 << 4;
+        cp0_.registers_[cp0_.EntryHi] &= 0x00001fff; 
+        cp0_.registers_[cp0_.EntryHi] |= virtual_addr & 0xffffe000;
+        exception = true;
+        return 0x00;
     }
 
     // virtual memory layout
