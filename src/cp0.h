@@ -42,7 +42,19 @@ struct CP0 {
     void set_interrupt_code(uint32_t interrupt_code) {
         registers_[Cause] |= interrupt_code << 8;
     }
-    
+
+    bool interrupt_enabled() const {
+        return !(registers_[Status] & 0x03);
+    }
+
+    bool interrupt_enabled(uint32_t interrupt_mask) const {
+        return registers_[Status] & interrupt_mask << 8;
+    }
+
+    void set_Status_EXL() {
+        registers_[Status] |= 0x02;
+    }
+
     enum :uint32_t {
         // IP7-0 field in Cause
         IP_0 = 1,
