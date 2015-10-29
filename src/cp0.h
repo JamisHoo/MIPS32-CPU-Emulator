@@ -54,6 +54,10 @@ struct CP0 {
     void set_Status_EXL() {
         registers_[SR] |= 0x02;
     }
+    
+    bool Status_EXL() const {
+        return registers_[SR] & 0x02;
+    }
 
     enum :uint32_t {
         // IP7-0 field in Cause
