@@ -1,6 +1,6 @@
 #include "cpu.h"
 
-void CPU::instruction_decode() {
+void CPU::instruction_decode(bool& exception) {
     switch (main_opcode()) {
         case 0b000000: 
             switch (sub_opcode()) {
@@ -70,9 +70,10 @@ void CPU::instruction_decode() {
                 // sltu
                 case 0b101011:
                     return exe_sltu();
-                // TODO: exception
                 default:
-                    ;
+                    cp0_.set_exception_code(cp0_.Exc_RI);
+                    exception = true;
+                    return;
             }
         case 0b000001: 
             switch (rt()) {
@@ -82,9 +83,10 @@ void CPU::instruction_decode() {
                 // bgez
                 case 0b00001:
                     return exe_bgez();
-                // TODO: exception
                 default:
-                    ;
+                    cp0_.set_exception_code(cp0_.Exc_RI);
+                    exception = true;
+                    return;
             }
         // j
         case 0b000010:
@@ -135,9 +137,10 @@ void CPU::instruction_decode() {
                         // mtc0
                         case 0b00100:
                             return exe_mtc0();
-                        // TODO: exception
                         default:
-                            ; 
+                            cp0_.set_exception_code(cp0_.Exc_RI);
+                            exception = true;
+                            return;
                     }
                 // tlbwi
                 case 0b000010:
@@ -145,9 +148,10 @@ void CPU::instruction_decode() {
                 // eret
                 case 0b011000:
                     return exe_eret();
-                // TODO: exception
                 default:
-                    ;
+                    cp0_.set_exception_code(cp0_.Exc_RI);
+                    exception = true;
+                    return;
             }
         // lb
         case 0b100000:
@@ -170,6 +174,5 @@ void CPU::instruction_decode() {
         // cache
         case 0b101111:
             return exe_cache();
-            ;
     }
 }
