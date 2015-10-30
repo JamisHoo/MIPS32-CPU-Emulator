@@ -6,7 +6,7 @@ int main() {
     using namespace std;
     
     ifstream rom("../image/rom");
-    ifstream flash("../image/kernel");
+    ifstream flash("../image/disk0");
 
     CPU cpu(rom, flash);
 
