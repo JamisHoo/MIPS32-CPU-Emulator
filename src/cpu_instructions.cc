@@ -34,8 +34,9 @@ void CPU::exe_jr(bool&) {
 }
 
 void CPU::exe_jalr(bool&) {
+    uint32_t npc = registers_[rs()];
     registers_[rd()] = pc_ + 4;
-    pc_ = registers_[rs()];
+    pc_ = npc;
 }
 
 void CPU::exe_syscall(bool& exception) {
