@@ -22,6 +22,11 @@ void CPU::exe_sllv(bool&) {
     pc_ += 4;
 }
 
+void CPU::exe_srlv(bool&) {
+    registers_[rd()] = registers_[rt()] >> registers_[rs()];
+    pc_ += 4;
+}
+
 void CPU::exe_srav(bool&) {
     int32_t val = registers_[rt()];
     val >>= registers_[rs()];
@@ -215,7 +220,6 @@ void CPU::exe_tlbwi(bool&) {
 
 void CPU::exe_eret(bool&) {
     pc_ = cp0_.registers_[cp0_.EPC];
-    // hardware should be responsible for restoring EXL
     cp0_.registers_[cp0_.SR] &= 0xfffffffd;
 }
 

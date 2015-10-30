@@ -13,6 +13,7 @@ public:
             next(exception);
             
             if (exception) {
+
                 // store return pc only in normal level
                 if (!cp0_.Status_EXL())
                     cp0_.registers_[cp0_.EPC] = pc_;
@@ -26,6 +27,7 @@ public:
     
 private:
     void next(bool& exception) {
+
         registers_[REG_ZERO] = 0x00;
 
         cp0_.registers_[cp0_.Count]++;
@@ -39,9 +41,9 @@ private:
         // instruction fetch
         instruction_ = mmu_.read_word(pc_, exception);
 
+
         // instruction decode
         instruction_decode(exception);
-
 
         // TODO: what if exception is already triggered?
 
@@ -65,6 +67,7 @@ private:
     void exe_srl(bool& exception); 
     void exe_sra(bool& exception); 
     void exe_sllv(bool& exception); 
+    void exe_srlv(bool& exception);
     void exe_srav(bool& exception); 
     void exe_jr(bool& exception);
     void exe_jalr(bool& exception);

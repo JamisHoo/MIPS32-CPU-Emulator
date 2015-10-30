@@ -18,7 +18,7 @@ void CPU::instruction_decode(bool& exception) {
                     return exe_sllv(exception);
                 // srav
                 case 0b000110:
-                    return exe_srav(exception);
+                    return exe_srlv(exception);
                 // srav
                 case 0b000111:
                     return exe_srav(exception);
