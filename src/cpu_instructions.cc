@@ -220,7 +220,8 @@ void CPU::exe_tlbwi(bool&) {
 
 void CPU::exe_eret(bool&) {
     pc_ = cp0_.registers_[cp0_.EPC];
-    cp0_.registers_[cp0_.SR] &= 0xfffffffd;
+    //cp0_.registers_[cp0_.SR] &= 0xfffffffd;
+    cp0_.unset_Status_EXL();
 }
 
 void CPU::exe_lb(bool& exception) {

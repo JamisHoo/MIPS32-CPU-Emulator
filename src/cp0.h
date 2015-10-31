@@ -57,6 +57,10 @@ struct CP0 {
     void set_Status_EXL() {
         registers_[SR] |= 0x02;
     }
+
+    void unset_Status_EXL() {
+        registers_[SR] &= 0xfffffffd;
+    }
     
     bool Status_EXL() const {
         return registers_[SR] & 0x02;
