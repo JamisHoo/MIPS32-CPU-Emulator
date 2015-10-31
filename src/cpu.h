@@ -39,12 +39,11 @@ private:
 
         // instruction fetch
         instruction_ = mmu_.read_word(pc_, exception);
-
-
+        if (exception) return;
+        
         // instruction decode
         instruction_decode(exception);
         if (exception) return;
-
 
         // timer interrupt
         // interrupt will be handled after the current instruction
