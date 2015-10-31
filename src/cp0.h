@@ -47,7 +47,7 @@ struct CP0 {
     }
 
     bool interrupt_enabled() const {
-        return !(registers_[SR] & 0b111);
+        return (registers_[SR] & 0b111) == 0b001;
     }
 
     bool interrupt_enabled(uint32_t interrupt_mask) const {
