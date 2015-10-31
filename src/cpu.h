@@ -32,7 +32,6 @@ private:
         cp0_.registers_[cp0_.Count]++;
 
         
-        // TODO: who is responsible for clearing Count register
         // TODO: does KSU count?
         // TODO: need to check IE/EXL before enter exception handling?
 
