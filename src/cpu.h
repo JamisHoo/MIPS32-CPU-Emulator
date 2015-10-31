@@ -33,7 +33,6 @@ private:
 
         
         // TODO: does KSU count?
-        // TODO: need to check IE/EXL before enter exception handling?
 
         // instruction fetch
         instruction_ = mmu_.read_word(pc_, exception);
