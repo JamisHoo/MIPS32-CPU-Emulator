@@ -47,8 +47,6 @@ void CPU::exe_jalr(bool&) {
 void CPU::exe_syscall(bool& exception) {
     cp0_.set_exception_code(cp0_.Exc_Syscall);
     exception = true;
-    // TODO: advance pc?
-    // pc_ += 4;
     return;
 }
 
