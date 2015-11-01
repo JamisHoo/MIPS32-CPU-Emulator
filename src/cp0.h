@@ -8,6 +8,7 @@ struct CP0 {
         registers_[EBase] = 0x80000180;
     }
 
+    // CP0 registers alias
     enum { 
         SR = 12, 
         Cause = 13,
@@ -23,8 +24,8 @@ struct CP0 {
         EBase = 15
     };
 
+    // ExcCode field in Cause
     enum :uint32_t {
-        // ExcCode field in Cause
         Exc_Int = 0,
         Exc_Mod = 1,
         Exc_TLBL = 2,
@@ -64,8 +65,8 @@ struct CP0 {
         return registers_[SR] & 0x02;
     }
 
+    // IP7-0 field in Cause
     enum :uint32_t {
-        // IP7-0 field in Cause
         IP_0 = 1,
         IP_1 = 2,
         IP_2 = 4,
