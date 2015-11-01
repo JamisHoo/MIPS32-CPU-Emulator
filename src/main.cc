@@ -6,8 +6,8 @@
 int main() {
     using namespace std;
     
-    ifstream rom("../image/rom");
-    ifstream flash("../image/disk0");
+    ifstream rom("image/rom");
+    ifstream flash("image/disk0");
 
     // copy files to memory to speed up access
     stringstream rom_buffer;
