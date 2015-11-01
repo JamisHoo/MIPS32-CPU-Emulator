@@ -9,7 +9,7 @@
 
 class MMU {
 public:
-    MMU(CP0& cp0, std::ifstream& rom, std::ifstream& flash):
+    MMU(CP0& cp0, std::istream& rom, std::istream& flash):
         cp0_(cp0), rom_(rom), flash_(flash) {
         ram_.resize(RAM_SIZE);    
         // need not initialize TLB
@@ -220,8 +220,8 @@ private:
     constexpr static uint32_t SERIAL_STATUS = 0x1fd003fc;
 
     std::string ram_;
-    std::ifstream& rom_;
-    std::ifstream& flash_;
+    std::istream& rom_;
+    std::istream& flash_;
 
     CP0& cp0_;
 

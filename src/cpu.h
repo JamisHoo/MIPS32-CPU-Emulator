@@ -5,7 +5,7 @@
 
 class CPU {
 public:
-    CPU(std::ifstream& rom, std::ifstream& flash): cp0_(), mmu_(cp0_, rom, flash), pc_(PC_INITIAL) { }
+    CPU(std::istream& rom, std::istream& flash): cp0_(), mmu_(cp0_, rom, flash), pc_(PC_INITIAL) { }
 
     void run() {
         while (true) {
