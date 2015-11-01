@@ -1,4 +1,5 @@
 #include <fstream>
+#include <sstream>
 
 #include "cpu.h"
 
@@ -8,7 +9,15 @@ int main() {
     ifstream rom("../image/rom");
     ifstream flash("../image/disk0");
 
-    CPU cpu(rom, flash);
+    // copy files to memory to speed up access
+    stringstream rom_buffer;
+    stringstream flash_buffer;
+    copy(istreambuf_iterator<char>(rom), istreambuf_iterator<char>(), 
+         ostreambuf_iterator<char>(rom_buffer));
+    copy(istreambuf_iterator<char>(flash), istreambuf_iterator<char>(), 
+         ostreambuf_iterator<char>(flash_buffer));
+
+    CPU cpu(rom_buffer, flash_buffer);
 
     cpu.run();
 
