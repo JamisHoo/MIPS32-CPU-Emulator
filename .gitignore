@@ -3,3 +3,8 @@
 
 # MAC OS X
 *.DS_Store
+
+# exe
+cpu
+cpu.js
+cpu.js.mem
