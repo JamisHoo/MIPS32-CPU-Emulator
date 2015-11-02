@@ -15,4 +15,4 @@ cpu.html: $(SOURCES) $(HEADERS)
 
 
 clean:
-	$(RM) cpu cpu.js cpu.html cpu.html.mem
+	$(RM) cpu cpu.js cpu.html cpu.html.mem cpu.data
