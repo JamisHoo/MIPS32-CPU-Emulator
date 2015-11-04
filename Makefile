@@ -1,4 +1,3 @@
-
 SOURCES = $(shell ls src/*.cc)
 HEADERS = $(shell ls src/*.h)
 
