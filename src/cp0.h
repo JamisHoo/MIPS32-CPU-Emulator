@@ -36,31 +36,38 @@ struct CP0 {
         Exc_RI = 10
     };
 
+    // call this function when exception occurs
     void set_exception_code(uint32_t exc_code) {
         registers_[Cause] &= 0xffffff83;
         registers_[Cause] |= exc_code << 2;
     }
 
+    // call this function when interrupt occurs, also call set_exception_code()
     void set_interrupt_code(uint32_t interrupt_code) {
         registers_[Cause] |= interrupt_code << 8;
     }
 
+    // global interrupt is enabled
     bool interrupt_enabled() const {
         return (registers_[SR] & 0b111) == 0b001;
     }
 
+    // specific interrupt is enabled
     bool interrupt_enabled(uint32_t interrupt_mask) const {
         return registers_[SR] & interrupt_mask << 8;
     }
 
+    // enter Exception Level from Normal Level
     void set_Status_EXL() {
         registers_[SR] |= 0x02;
     }
 
+    // quit Exception Level
     void unset_Status_EXL() {
         registers_[SR] &= 0xfffffffd;
     }
     
+    // in Exception Level or Normal Level
     bool Status_EXL() const {
         return registers_[SR] & 0x02;
     }
