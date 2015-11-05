@@ -70,6 +70,7 @@ void CPU::instruction_decode(bool& exception) {
                 // sltu
                 case 0b101011:
                     return exe_sltu(exception);
+                // unknown instruction exception
                 default:
                     cp0_.set_exception_code(cp0_.Exc_RI);
                     exception = true;
@@ -83,6 +84,7 @@ void CPU::instruction_decode(bool& exception) {
                 // bgez
                 case 0b00001:
                     return exe_bgez(exception);
+                // unknown instruction exception
                 default:
                     cp0_.set_exception_code(cp0_.Exc_RI);
                     exception = true;
@@ -137,6 +139,7 @@ void CPU::instruction_decode(bool& exception) {
                         // mtc0
                         case 0b00100:
                             return exe_mtc0(exception);
+                        // unknown instruction exception
                         default:
                             cp0_.set_exception_code(cp0_.Exc_RI);
                             exception = true;
@@ -148,6 +151,7 @@ void CPU::instruction_decode(bool& exception) {
                 // eret
                 case 0b011000:
                     return exe_eret(exception);
+                // unknown instruction exception
                 default:
                     cp0_.set_exception_code(cp0_.Exc_RI);
                     exception = true;
@@ -174,6 +178,7 @@ void CPU::instruction_decode(bool& exception) {
         // cache
         case 0b101111:
             return exe_cache(exception);
+        // unknown instruction exception
         default:
             cp0_.set_exception_code(cp0_.Exc_RI);
             exception = true;
