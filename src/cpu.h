@@ -42,13 +42,13 @@ private:
         instruction_decode(exception);
         if (exception) return;
 
-        // timer interrupt
+        // clock interrupt
         // interrupt will be handled after the current instruction
         if (cp0_.registers_[cp0_.Count] >= cp0_.registers_[cp0_.Compare]) {
             cp0_.registers_[cp0_.Count] = 0x00;
 
             if (cp0_.interrupt_enabled() && /* IE and EXL */
-                cp0_.interrupt_enabled(cp0_.IP_7) /* timer interrupt is enabled */) {
+                cp0_.interrupt_enabled(cp0_.IP_7) /* clock interrupt is enabled */) {
                 cp0_.set_interrupt_code(cp0_.IP_7);
                 cp0_.set_exception_code(cp0_.Exc_Int);
                 exception = true;
