@@ -16,7 +16,6 @@ public:
     }
 
     uint8_t read_byte(uint32_t virtual_addr, bool& exception) {
-        // TODO: Exception: access kernel space from user mode?
         uint32_t physical_addr = addr_translate(virtual_addr, 0, exception);
         if (exception) return 0x00;
         return read_physical(physical_addr); 
