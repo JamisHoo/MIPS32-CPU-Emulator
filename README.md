@@ -61,7 +61,7 @@ serial port status | 0x1fd003fc    | 0x1fd003fd  | 1B
 
 Serial port input is not implemented yet. 
 The least significant bit of `serial port status` represents serial port is writeable (1) or not (0).
-The second least significant bit of `serial port status` represents serial port is readable or not.
+The second least significant bit of `serial port status` represents serial port is readable.
 
 ### Program Counter (PC)
 PC is initialized to 0xbfc00000 (virtual address). So you should always put ROM at 0x1fc0000 (physical address). This emulator imitates a single-cycle MIPS processor so delay slot is not supported. 
