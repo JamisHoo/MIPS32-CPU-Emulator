@@ -31,8 +31,6 @@ private:
 
         cp0_.registers_[cp0_.Count]++;
 
-        
-        // TODO: does KSU count?
 
         // instruction fetch
         instruction_ = mmu_.read_word(pc_, exception);
