@@ -15,7 +15,7 @@ First, compile the emulator.
 $ make
 ```
 
-Then run the emulator on local machine. 
+Run the emulator on local machine. 
 
 ```
 $ ./cpu
@@ -61,7 +61,7 @@ serial port status | 0x1fd003fc    | 0x1fd003fd  | 1B
 
 Serial port input is not implemented yet. 
 The least significant bit of `serial port status` represents serial port is writeable (1) or not (0).
-The second least significant bit of `serial port status` represents serial port is readable (1) or not (0).
+The second least significant bit of `serial port status` represents serial port is readable or not.
 
 ### Program Counter (PC)
 PC is initialized to 0xbfc00000 (virtual address). So you should always put ROM at 0x1fc0000 (physical address). This emulator imitates a single-cycle MIPS processor so delay slot is not supported. 
@@ -107,7 +107,7 @@ no matter this interrupt is enabled or not.
 * Status
 
     `IE`, `EXL`, `IM7-0` fields are implemented in hardware. 
-`EXL` is set when exceptions occur and is unset when excetuing `eret` instructions. 
+`EXL` is set when exceptions occur and is unset when excetuing `eret` instructions. All these bits are initialized to 0.
 
 * Cause
 
