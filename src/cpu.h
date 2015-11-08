@@ -5,7 +5,8 @@
 
 class CPU {
 public:
-    CPU(std::istream& rom, std::istream& flash): cp0_(), mmu_(cp0_, rom, flash), pc_(PC_INITIAL) { }
+    CPU(std::istream& rom, std::istream& flash): 
+        cp0_(), mmu_(cp0_, rom, flash), pc_(PC_INITIAL) { }
 
     void run() {
         while (true) {
@@ -27,8 +28,10 @@ public:
 private:
     void next(bool& exception) {
 
+        // zero registers is forever return 0
         registers_[REG_ZERO] = 0x00;
-
+        
+        // increment Count register
         cp0_.registers_[cp0_.Count]++;
 
 
@@ -107,6 +110,7 @@ private:
     void exe_cache(bool& exception);
 
 
+    // fields of instruction
     uint32_t main_opcode() const { return instruction_ >> 26; }
     uint32_t sub_opcode() const { return instruction_ & 0x3f; }
     uint32_t rs() const { return instruction_ >> 21 & 0x1f; }
@@ -118,11 +122,13 @@ private:
     int16_t signed_immediate() const { return int16_t(instruction_ & 0xffff); }
     uint16_t unsigned_immediate() const { return uint16_t(instruction_ & 0xffff); }
 
+    // virtual address of initial PC
     constexpr static uint32_t PC_INITIAL = 0xbfc00000;
 
     CP0 cp0_;
     MMU mmu_;
 
+    // general-purpose registers alias
     enum { 
         REG_ZERO = 0, 
         REG_AT = 1, 
@@ -138,9 +144,13 @@ private:
         REG_RA = 31
     };
 
+    // general-purpose registers
     uint32_t registers_[32];
+    // pc registers
     uint32_t pc_;
+    // current instruction
     uint32_t instruction_;
+    // registers for multiplication and division
     uint32_t hi_, lo_;
 
 };
