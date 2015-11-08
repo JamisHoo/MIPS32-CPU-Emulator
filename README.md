@@ -15,7 +15,7 @@ First, compile the emulator.
 $ make
 ```
 
-Then, run the emulator on local machine.
+Then run the emulator on local machine.
 
 ```
 $ ./cpu
@@ -27,8 +27,8 @@ Run the emulator with Node.js (supposing you've already installed Node.js).
 $ node cpu.js
 ```
 
-Setup a web server and open cpu.html if you want to run it in browsers. The OS image file is 
-kind of big, so you may use some compression techniques.
+Setup a web server and open cpu.html if you want to run it in browsers. 
+The OS image file is kind of big, so you may use some compression techniques.
 
 ## About Implementation
 
@@ -139,4 +139,13 @@ Currently supported exceptions.
 
 ## References
 
+1. [Cache CPU](https://github.com/JamisHoo/Cache-CPU)
+2. *See MIPS Run*
+3. *MIPS32 Architecture For Programmers Volume III: The MIPS32 Privileged Resource Architecture*
+4. [uCore Lab Documents](https://www.gitbook.com/book/objectkuan/ucore-docs/details)
+
 ## License
+
+Source code of the emulator (in src directory) is distributed under the MIT License.
+
+uCore (in ucore_OS directory) is distributed under its own license.
