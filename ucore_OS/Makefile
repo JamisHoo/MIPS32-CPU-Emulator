@@ -6,7 +6,7 @@ SLASH	:= /
 V       := @
 
 # try to infer the correct GCCPREFX
-GCCPREFIX := /root/mips-2014.05/bin/mips-linux-gnu-
+GCCPREFIX := mips-linux-gnu-
 
 # try to infer the correct QEMU
 QEMU := qemu-system-mipsel
